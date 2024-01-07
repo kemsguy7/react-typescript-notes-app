@@ -1,0 +1,1 @@
+A simple notes app created with react and typescript
