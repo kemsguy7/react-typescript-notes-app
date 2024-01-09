@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.updateNote = exports.createNote = exports.getNote = exports.getNotes = void 0;
+exports.deleteNote = exports.updateNote = exports.createNote = exports.getNote = exports.getNotes = void 0;
 const notes_1 = __importDefault(require("../models/notes"));
 const http_errors_1 = __importDefault(require("http-errors"));
 const mongoose_1 = __importDefault(require("mongoose"));
@@ -50,6 +50,9 @@ const createNote = (req, res, next) => __awaiter(void 0, void 0, void 0, functio
         if (!title) { //if tilte is not present 
             throw (0, http_errors_1.default)(400, "Note must have a title");
         }
+        else if (!text) {
+            throw (0, http_errors_1.default)(400, "Note must have a text");
+        }
         const newNote = yield notes_1.default.create({
             title: title,
             text: text,
@@ -61,11 +64,47 @@ const createNote = (req, res, next) => __awaiter(void 0, void 0, void 0, functio
     }
 });
 exports.createNote = createNote;
-interfacr;
 const updateNote = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const noteId = req.params.noteId;
+    const newTitle = req.body.title;
+    const newText = req.body.text;
     try {
+        if (!mongoose_1.default.isValidObjectId(noteId)) { // if an invalid note id was supplied
+            throw (0, http_errors_1.default)(400, "invalid note id");
+        }
+        if (!newTitle) {
+            throw (0, http_errors_1.default)(400, "Note must have a title");
+        }
+        const note = yield notes_1.default.findById(noteId).exec();
+        if (!note) {
+            throw (0, http_errors_1.default)(404, "Note not found");
+        }
+        note.title = newTitle;
+        note.text = newText;
+        const updatedNote = yield note.save();
+        res.status(200).json(updatedNote);
     }
     catch (error) {
+        next(error);
     }
 });
 exports.updateNote = updateNote;
+const deleteNote = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const noteId = req.params.noteId;
+    try {
+        if (!mongoose_1.default.isValidObjectId(noteId)) {
+            // If an invalid note id was supplied
+            throw (0, http_errors_1.default)(400, 'Invalid note id');
+        }
+        const note = yield notes_1.default.findById(noteId).exec();
+        if (!note) {
+            throw (0, http_errors_1.default)(404, 'Note not found');
+        }
+        yield notes_1.default.deleteOne({ _id: noteId }); // Use deleteOne to remove the document
+        res.sendStatus(204); // Use sendStatus since we're not passing json
+    }
+    catch (error) {
+        next(error);
+    }
+});
+exports.deleteNote = deleteNote;

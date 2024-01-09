@@ -47,6 +47,8 @@ export const createNote: RequestHandler<unknown, unknown, CreateNoteBody, unknow
 
         if (!title) {  //if tilte is not present 
             throw createHttpError(400, "Note must have a title");
+        } else if (!text) {
+            throw createHttpError(400, "Note must have a text");
         }
 
         const newNote = await NoteModel.create({
@@ -60,12 +62,70 @@ export const createNote: RequestHandler<unknown, unknown, CreateNoteBody, unknow
     }
 }
 
-interfacr
+/***************************************************************************************** UPDATE NOTES */
 
-export const updateNote: RequestHandler =  async (req, res, next) => {
+interface UpdateNoteParams {
+    noteId: string, //where not making it optional because you can't get to this route without passing in a noteid :  router.patch("/:noteId", NotesController.updateNote)
+}
+
+interface updateNoteBody {
+    title?: string,
+    text?: string,
+}
+
+export const updateNote: RequestHandler<UpdateNoteParams, unknown, updateNoteBody, unknown> = async (req, res, next) => {
+
+    const noteId = req.params.noteId;
+    const newTitle = req.body.title;
+    const newText = req.body.text;
+
     try {
+        if (!mongoose.isValidObjectId(noteId)) { // if an invalid note id was supplied
+            throw createHttpError(400, "invalid note id");
+        }
+
+        if (!newTitle) {
+            throw createHttpError(400, "Note must have a title");
+        }
+
+        const note = await NoteModel.findById(noteId).exec();
+
+        if (!note) {
+            throw createHttpError(404, "Note not found");
+        }
+
+        note.title = newTitle;
+        note.text = newText;
+
+        const updatedNote = await note.save();
+        res.status(200).json(updatedNote);
 
     } catch (error) {
-
+        next(error);
     }
-}
+};
+
+
+export const deleteNote: RequestHandler = async (req, res, next) => {
+  const noteId = req.params.noteId;
+
+  try {
+    if (!mongoose.isValidObjectId(noteId)) {
+      // If an invalid note id was supplied
+      throw createHttpError(400, 'Invalid note id');
+    }
+
+    const note = await NoteModel.findById(noteId).exec();
+
+    if (!note) {
+      throw createHttpError(404, 'Note not found');
+    }
+
+    await NoteModel.deleteOne({ _id: noteId }); // Use deleteOne to remove the document
+
+    res.sendStatus(204); // Use sendStatus since we're not passing json
+  } catch (error) {
+    next(error);
+  }
+};
+ 
