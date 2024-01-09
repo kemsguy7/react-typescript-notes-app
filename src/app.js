@@ -8,10 +8,13 @@ const express_1 = __importDefault(require("express"));
 const notes_1 = __importDefault(require("./routes/notes")); //the imported func can be named anything 
 //This script houses all endpoints
 const app = (0, express_1.default)();
+//add express so that it accepts json bodies
+app.use(express_1.default.json());
 app.use("/api/notes", notes_1.default);
 app.use((req, res, next) => {
     next(Error("Endpoint not found"));
 });
+//Error handling the 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 app.use((error, req, res, next) => {
     console.error(error);

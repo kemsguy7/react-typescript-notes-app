@@ -15,10 +15,11 @@ app.use(( req, res, next ) => {
     next(Error("Endpoint not found"));
 });
 
-//Error handling the 
+
+
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-app.use((error: unknown, req: Request, res: Response, next: NextFunction) => {
+app.use((error: unknown, req: Request, res: Response, next: NextFunction) => { //Error handling functionality 
     console.error(error);
     let errorMessage = "An unkwown error occurred";
     if (error instanceof Error) errorMessage = error.message;
