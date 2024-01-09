@@ -1,24 +1,20 @@
-import "dotenv/config";
+import app from './app';
+import env from "./util/validateEnv"
 import mongoose from "mongoose";
-import express from "express";
-const app = express();
 
+/**************************************************** This script is used to create a database connection to mongoDB */
 
-app.get("/", (req, res) => {
-    res.send("Hello World!");
-});
+const port = env.PORT; //env , gotten from the clean env setup in the  /util/validateEnv dir
 
-
-const port = process.env.PORT;
-
-mongoose.connect(process.env.MONGO_CONNECTION_STRING || 'default_connection_string')
+mongoose.connect(process.env.MONGO_CONNECTION_STRING!) 
     .then(() => {
         console.log("Mogoose Connected");
         app.listen(port, () => {
             console.log("Server running on port: " + port);
         });
     })
-.catch( console.error);                                    
+.catch(console.error);                                    
 
 
 
+ 
