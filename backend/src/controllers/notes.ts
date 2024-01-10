@@ -5,6 +5,7 @@ import mongoose from "mongoose";
 
 export const getNotes: RequestHandler = async (req, res, next) => {
     try {  //setting up error handlers
+        throw createHttpError(401);
         const notes = await NoteModel.find().exec(); //finds and executes the value of notes which is a promise
         res.status(200).json(notes);
     } catch (error) {
