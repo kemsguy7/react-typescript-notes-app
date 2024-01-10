@@ -2,6 +2,7 @@ import styles from "../styles/Note.module.css"
 import { Card } from "react-bootstrap";
 import { Note as NoteModel} from "../models/notes"; //using an alias to prevent errors
 import  { formatDate } from "../utils/formatDate"; //
+import { MdDelete } from  "react-icons/md";
 
 /***************************************************************************** NOTE COMPONENT SCRIPT */
 

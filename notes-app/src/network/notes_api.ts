@@ -1,6 +1,6 @@
 import { Note } from "../models/notes";
 
-/************************************************************************ THIS SCRIPT HANDLES NOTE CRUD OPERATION FROM THE FRONTEND */
+/********************************************************* THIS SCRIPT HANDLES NOTE CRUD OPERATION FROM THE FRONTEND (BROWSER) */
 async function fetchData(input: RequestInfo, init?: RequestInit) {
     const response = await fetch(input, init); 
     if (response.ok) {
@@ -32,4 +32,8 @@ export async function createNote(note: NoteInput): Promise<Note> { //creating ne
         body: JSON.stringify(note),
     });
     return response.json();
+}
+
+export async function deleteNote(noteId: string) {
+    await fetchData("/api/notes/" + noteId, { method: "DELETE"}); 
 }
