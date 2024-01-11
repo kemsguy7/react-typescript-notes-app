@@ -50,6 +50,18 @@ useEffect(() => {
   loadNotes();
 }, []);
 
+
+async function deleteNote(note: NoteModel) {
+  try {
+    await NotesApi.deleteNote(note._id);
+  } catch (error) {
+    console.error(error);
+    alert(error);
+  }
+}
+
+
+
 //JSX to render
 return (
   <Container>
@@ -61,7 +73,11 @@ return (
     <Row xs={1} md={2} xl={3} className="g-4">
     {notes.map(note => (
       <Col key={note._id}> 
-        <Note note={note} className={styles.note} />
+        <Note 
+          note={note} 
+          className={styles.note} 
+          onDeleteNoteClicked={deleteNote}
+        />
       </Col>
     ))}
     </Row>

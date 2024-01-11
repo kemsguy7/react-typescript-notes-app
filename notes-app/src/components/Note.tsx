@@ -9,7 +9,7 @@ import { MdDelete } from  "react-icons/md";
 
 interface NoteProps {
     note: NoteModel,
-    onDeleteNoteClicked: {note: NoteModel} => void: any,
+    onDeleteNoteClicked: (note: NoteModel) => void,
     className?: string,
 }
 
@@ -40,8 +40,10 @@ const Note = ({ note,  onDeleteNoteClicked, className }: NoteProps) => {
                     {title}
                     <MdDelete 
                         className="text-muted ms-auto"
-                        onClick={(e) => {
-                            onDeleteNoteClicked(note);        
+                        onClick={(e: { stopPropagation: () => void; }) => { //infer parameter tyoe from usage 
+                            onDeleteNoteClicked(note);   
+                            e.stopPropagation();
+
                         }}
                     
                     />
