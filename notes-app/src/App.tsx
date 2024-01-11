@@ -8,7 +8,8 @@ import Note from './components/Note';
 import styles from "./styles/NotesPage.module.css";
 import styleUtils from "./styles/utils.module.css"
 import * as NotesApi from "./network/notes_api";
-import AddNoteDialog from './components/AddNoteModal';
+import AddNoteDialog from './components/AddEditNoteDialog';
+import {FaPlus} from "react-icons/fa";
 
 function App() {
 
@@ -51,9 +52,10 @@ useEffect(() => {
 }, []);
 
 
-async function deleteNote(note: NoteModel) {
+async function deleteNote(note: NoteModel) { //delete functionality for notes 
   try {
     await NotesApi.deleteNote(note._id);
+    setNotes(notes.filter(existingNote => existingNote._id !== note._id)); //removes only the note with the id of the one we want to delete
   } catch (error) {
     console.error(error);
     alert(error);
@@ -61,13 +63,13 @@ async function deleteNote(note: NoteModel) {
 }
 
 
-
 //JSX to render
 return (
   <Container>
     <Button 
-      className={`mb-4 ${styleUtils.blockCenter}`}
+      className={`mb-4 ${styleUtils.blockCenter} ${styleUtils.flexCenter}`}
       onClick={() => setShowAddNoteDialog(true)}> 
+      <FaPlus />
       Add New Note
     </Button> 
     <Row xs={1} md={2} xl={3} className="g-4">

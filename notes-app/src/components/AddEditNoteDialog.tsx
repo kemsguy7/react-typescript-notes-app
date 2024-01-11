@@ -5,15 +5,23 @@ import { NoteInput } from "../network/notes_api";
 import * as NotesApi from "../network/notes_api";
 /****************************************** THIS SCRIPT HOUSES THE POPUP MODAL THAT IS USED TO ADD NOTE */
 
-interface AddNoteDialogProps {
+interface AddEditNoteDialogProps {
+    noteToEdit?: Note, 
     onDismiss: () => void,
     onNoteSaved: (note: Note) => void,
 }
 
 
-const AddNoteDialog = ({ onDismiss, onNoteSaved }: AddNoteDialogProps) => {
-    const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<NoteInput>(); //using the interdage defined in ../network/notes_api
-  
+const AddEditNoteDialog = ({ noteToEdit, onDismiss, onNoteSaved }: AddEditNoteDialogProps) => {
+
+
+    const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<NoteInput>({ //using the interdage defined in ../network/notes_api
+        defaultValues: {  //define default values 
+            title: noteToEdit?.title || "",
+            text: noteToEdit?.text || "",
+        }
+    }); 
+    
     async function onSubmit(input: NoteInput) {
       try {
         const noteResponse = await NotesApi.createNote(input);
@@ -29,7 +37,7 @@ const AddNoteDialog = ({ onDismiss, onNoteSaved }: AddNoteDialogProps) => {
         <Modal show onHide = {onDismiss}> 
             <Modal.Header closeButton> 
                 <Modal.Title> 
-                    Add Note
+                    {noteToEdit? "Edit note": "Add note"}
                 </Modal.Title>
             </Modal.Header>
 
@@ -40,6 +48,7 @@ const AddNoteDialog = ({ onDismiss, onNoteSaved }: AddNoteDialogProps) => {
                         <Form.Control 
                         type="text" 
                         placeholder="Title"
+                        isInvalid={!!errors.title}  //if there is an error for the title, show it here resolves to true or false
                         {...register("title", { required: "Required" })}
                         />
                         <Form.Control.Feedback type="invalid">
@@ -72,7 +81,7 @@ const AddNoteDialog = ({ onDismiss, onNoteSaved }: AddNoteDialogProps) => {
     );
 }
 
-export default AddNoteDialog;
+export default AddEditNoteDialog;
 
 function onNoteSaved(noteResponse: Note) {
     throw new Error("Function not implemented.");
