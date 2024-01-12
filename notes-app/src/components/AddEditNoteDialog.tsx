@@ -51,6 +51,9 @@ const AddEditNoteDialog = ({ noteToEdit, onDismiss, onNoteSaved }: AddEditNoteDi
 
             <Modal.Body> 
                 <Form id="addEditNoteForm" onSubmit={handleSubmit(onSubmit)}> 
+
+                   <T
+
                     <Form.Group className="mb-3">
                         <Form.Label> Title </Form.Label>
                         <Form.Control 
