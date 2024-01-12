@@ -4,6 +4,9 @@ import notesRoutes from "./routes/notes"; //the imported func can be named anyth
 import userRoutes from "./routes/users";
 import morgan from "morgan";
 import createHttpError, { isHttpError } from "http-errors";
+import session from "express-session";
+import env from "./util/validateEnv"; // import our validateEnv.ts file
+import MongoStore from "connect-mongo";
 
 //This script houses all endpoints
 
@@ -13,6 +16,22 @@ app.use(morgan("dev"));
 
 //add express so that it accepts json bodies
 app.use(express.json());
+
+app.use(session({
+    name: "session",
+    secret: env.SESSION_SECRET,
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+        httpOnly: true,
+        secure: false,
+        maxAge: 1000 * 60 * 60 * 24, //24 hours
+    },
+    rolling: true, //As long as the user is active, the session will be extended (refreshed automatically after expiration)
+    store: MongoStore.create({ 
+        mongoUrl: env.MONGO_CONNECTION_STRING  //connect-mongo will create a new collection called sessions in our database
+    }),
+}));
 
 app.use("/api/users", userRoutes);
 app.use("/api/notes", notesRoutes);

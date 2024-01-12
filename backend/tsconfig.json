@@ -111,6 +111,6 @@
     "skipLibCheck": true                                 /* Skip type checking all .d.ts files. */
   },
   "ts-node": { //use to automatically restart our app 
-    "files": true
-  }
+    "files": true  //helps make sure that ts-node will be able to find our tsconfig.json file and sessions work
+  } 
 }

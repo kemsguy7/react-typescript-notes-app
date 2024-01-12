@@ -32,11 +32,29 @@ const notes_1 = __importDefault(require("./routes/notes")); //the imported func 
 const users_1 = __importDefault(require("./routes/users"));
 const morgan_1 = __importDefault(require("morgan"));
 const http_errors_1 = __importStar(require("http-errors"));
+const express_session_1 = __importDefault(require("express-session"));
+const validateEnv_1 = __importDefault(require("./util/validateEnv")); // import our validateEnv.ts file
+const connect_mongo_1 = __importDefault(require("connect-mongo"));
 //This script houses all endpoints
 const app = (0, express_1.default)();
 app.use((0, morgan_1.default)("dev"));
 //add express so that it accepts json bodies
 app.use(express_1.default.json());
+app.use((0, express_session_1.default)({
+    name: "session",
+    secret: validateEnv_1.default.SESSION_SECRET,
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+        httpOnly: true,
+        secure: false,
+        maxAge: 1000 * 60 * 60 * 24, //24 hours
+    },
+    rolling: true, //As long as the user is active, the session will be extended (refreshed automatically after expiration)
+    store: connect_mongo_1.default.create({
+        mongoUrl: validateEnv_1.default.MONGO_CONNECTION_STRING //connect-mongo will create a new collection called sessions in our database
+    }),
+}));
 app.use("/api/users", users_1.default);
 app.use("/api/notes", notes_1.default);
 app.use((req, res, next) => {

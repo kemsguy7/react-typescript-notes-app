@@ -12,10 +12,24 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.signUp = void 0;
+exports.login = exports.signUp = exports.getAuthenticatedUser = void 0;
 const http_errors_1 = __importDefault(require("http-errors"));
 const user_1 = __importDefault(require("../models/user"));
 const bcrypt_1 = __importDefault(require("bcrypt"));
+const getAuthenticatedUser = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const getAuthenticatedUserId = req.session.userId;
+    try {
+        if (!getAuthenticatedUserId) {
+            throw (0, http_errors_1.default)(401, "You are not authenticated, please login and try again");
+        }
+        const user = yield user_1.default.findById(getAuthenticatedUserId).select("+Email").exec();
+        res.status(200).json(user);
+    }
+    catch (error) {
+        next(error);
+    }
+});
+exports.getAuthenticatedUser = getAuthenticatedUser;
 const signUp = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const username = req.body.username;
     const email = req.body.email;
@@ -38,6 +52,7 @@ const signUp = (req, res, next) => __awaiter(void 0, void 0, void 0, function* (
             email: email,
             password: passwordHashed,
         });
+        req.session.userId = newUser._id; //create a session for the user
         res.status(201).json(newUser);
     }
     catch (error) {
@@ -45,3 +60,28 @@ const signUp = (req, res, next) => __awaiter(void 0, void 0, void 0, function* (
     }
 });
 exports.signUp = signUp;
+const login = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const username = req.body.username;
+    const password = req.body.password;
+    try {
+        if (!username || !password) {
+            throw (0, http_errors_1.default)(400, "Missing username or password");
+        }
+        /* The select() function is used to specify which fields to include or exclude in the result set. The + symbol means to include the field, and - means to exclude.
+       In this case, it's including the password and email fields in the result set*/
+        const user = yield user_1.default.findOne({ username: username }).select("+password +email").exec();
+        if (!user) { //if creadentials don't match DB 
+            throw (0, http_errors_1.default)(401, "Wrong username or password");
+        }
+        const passwordMatch = yield bcrypt_1.default.compare(password, user.password);
+        if (!passwordMatch) { // if password doesn't match DB
+            throw (0, http_errors_1.default)(401, "invalid username or password");
+        }
+        req.session.userId = user._id; //create a session for the user
+        res.status(201).json(user);
+    }
+    catch (error) {
+        next(error);
+    }
+});
+exports.login = login;
