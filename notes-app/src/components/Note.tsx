@@ -9,11 +9,12 @@ import { MdDelete } from  "react-icons/md";
 
 interface NoteProps {
     note: NoteModel,
+    onNoteClicked: (note: NoteModel) => void, //for edit funnctionality
     onDeleteNoteClicked: (note: NoteModel) => void,
     className?: string,
 }
 
-const Note = ({ note,  onDeleteNoteClicked, className }: NoteProps) => {
+const Note = ({ note, onNoteClicked, onDeleteNoteClicked, className }: NoteProps) => {
 
    // using destructuring syntax to get note details
    const {
@@ -30,11 +31,11 @@ const Note = ({ note,  onDeleteNoteClicked, className }: NoteProps) => {
     createdUpdatedText = "Created: " + formatDate(createdAt);
    }
 
-
-
    //template literal is used in card so multiple classnamea ca beadded
     return (
-        <Card className={`${styles.noteCard} ${className}`}> 
+        <Card className={`${styles.noteCard} ${className}`}
+            onClick={() => onNoteClicked(note)}
+            > 
             <Card.Body className={styles.cardBody}>
                 <Card.Title className={styleUtils.flexCenter}>
                     {title}
@@ -44,8 +45,7 @@ const Note = ({ note,  onDeleteNoteClicked, className }: NoteProps) => {
                             onDeleteNoteClicked(note);   
                             e.stopPropagation();
 
-                        }}
-                    
+                        }}            
                     />
                 </Card.Title>
                 <Card.Text className={styles.cardText}> 

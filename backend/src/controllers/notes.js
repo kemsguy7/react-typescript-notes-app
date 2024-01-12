@@ -18,6 +18,7 @@ const http_errors_1 = __importDefault(require("http-errors"));
 const mongoose_1 = __importDefault(require("mongoose"));
 const getNotes = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try { //setting up error handlers
+        throw (0, http_errors_1.default)(401);
         const notes = yield notes_1.default.find().exec(); //finds and executes the value of notes which is a promise
         res.status(200).json(notes);
     }

@@ -14,25 +14,33 @@ interface AddEditNoteDialogProps {
 
 const AddEditNoteDialog = ({ noteToEdit, onDismiss, onNoteSaved }: AddEditNoteDialogProps) => {
 
-
     const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<NoteInput>({ //using the interdage defined in ../network/notes_api
         defaultValues: {  //define default values 
             title: noteToEdit?.title || "",
             text: noteToEdit?.text || "",
         }
     }); 
-    
+
+
     async function onSubmit(input: NoteInput) {
-      try {
-        const noteResponse = await NotesApi.createNote(input);
-        onNoteSaved(noteResponse);
-      } catch (error) {
-        console.error(error);
-        alert(error);
-      }
-    }
-
-
+        try {
+          if (!input.title) {  //check if title is not empty 
+            throw new Error('Title is required');
+          }
+       
+          let noteResponse: Note;
+          if (noteToEdit) {
+              noteResponse = await NotesApi.updateNote(noteToEdit._id, input); //update notes
+          } else {
+              noteResponse = await NotesApi.createNote(input); //create notes
+          }
+          onNoteSaved(noteResponse);
+        } catch (error) {
+          console.error(error);
+          alert(error);
+        }
+       }
+       
     return (
         <Modal show onHide = {onDismiss}> 
             <Modal.Header closeButton> 
@@ -42,7 +50,7 @@ const AddEditNoteDialog = ({ noteToEdit, onDismiss, onNoteSaved }: AddEditNoteDi
             </Modal.Header>
 
             <Modal.Body> 
-                <Form id="addNoteForm" onSubmit={handleSubmit(onSubmit)}> 
+                <Form id="addEditNoteForm" onSubmit={handleSubmit(onSubmit)}> 
                     <Form.Group className="mb-3">
                         <Form.Label> Title </Form.Label>
                         <Form.Control 
@@ -71,7 +79,7 @@ const AddEditNoteDialog = ({ noteToEdit, onDismiss, onNoteSaved }: AddEditNoteDi
             <Modal.Footer>
                 <Button
                 type="submit"
-                form="addNoteForm"
+                form="addEditNoteForm"
                 disabled={isSubmitting}
                 >
                 Save
@@ -83,6 +91,3 @@ const AddEditNoteDialog = ({ noteToEdit, onDismiss, onNoteSaved }: AddEditNoteDi
 
 export default AddEditNoteDialog;
 
-function onNoteSaved(noteResponse: Note) {
-    throw new Error("Function not implemented.");
-}

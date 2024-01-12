@@ -1,3 +1,15 @@
+.notesPage {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+}
+
+.notesGrid {
+    width: 100%;
+}
 .note {
     min-height: 200px;
     min-width: 150px;

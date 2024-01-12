@@ -26,31 +26,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-require("dotenv/config");
+/********************************** User authentication Routes */
 const express_1 = __importDefault(require("express"));
-const notes_1 = __importDefault(require("./routes/notes")); //the imported func can be named anything 
-const users_1 = __importDefault(require("./routes/users"));
-const morgan_1 = __importDefault(require("morgan"));
-const http_errors_1 = __importStar(require("http-errors"));
-//This script houses all endpoints
-const app = (0, express_1.default)();
-app.use((0, morgan_1.default)("dev"));
-//add express so that it accepts json bodies
-app.use(express_1.default.json());
-app.use("/api/users", users_1.default);
-app.use("/api/notes", notes_1.default);
-app.use((req, res, next) => {
-    next((0, http_errors_1.default)(404, "Endpoint not found"));
-});
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-app.use((error, req, res, next) => {
-    console.error(error);
-    let errorMessage = "An unkwown error occurred";
-    let statusCode = 500;
-    if ((0, http_errors_1.isHttpError)(error)) {
-        statusCode = error.status;
-        errorMessage = error.message;
-    }
-    res.status(statusCode).json({ error: errorMessage });
-});
-exports.default = app;
+const UserController = __importStar(require("../controllers/user"));
+const router = express_1.default.Router();
+router.post("/signup", UserController.signUp);
+exports.default = router;
